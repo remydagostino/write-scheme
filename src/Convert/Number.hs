@@ -1,4 +1,4 @@
-module Parse.Number
+module Convert.Number
   ( NumberBase(Hexadecimal, Decimal, Octal, Binary)
   , readWholePart
   , readFractionalPart
