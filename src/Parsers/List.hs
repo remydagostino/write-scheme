@@ -27,7 +27,7 @@ list =
 
 dottedList :: Parsec.Parser LispVal
 dottedList = do
-  head <- Parsec.endBy  expression spaces
+  head <- Parsec.endBy expression spaces
   tail <- Parsec.char '.' >> spaces >> expression
   return $ LispDottedList head tail
 

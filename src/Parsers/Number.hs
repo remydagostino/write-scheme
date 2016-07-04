@@ -7,7 +7,8 @@ import qualified Text.ParserCombinators.Parsec as Parsec
 import Text.ParserCombinators.Parsec ((<|>))
 
 import qualified Convert.Number as ConvertNumber
-import Data.Lisp (LispVal(LispNumber, LispFloat))
+import Data.Lisp (LispVal(LispNumber))
+import Data.Lisp.Num (LispNum(LispFloat, LispInt))
 
 numberInBase :: ConvertNumber.NumberBase -> Parsec.Parser LispVal
 numberInBase base =
@@ -18,9 +19,9 @@ numberInBase base =
 
     convertParts :: String -> Maybe String -> LispVal
     convertParts big Nothing =
-      LispNumber $ floor (fromMaybe 0 (ConvertNumber.readWholePart base big))
+      LispNumber $ LispInt $ floor (fromMaybe 0 (ConvertNumber.readWholePart base big))
     convertParts big (Just small) =
-      LispFloat $ double2Float (fromMaybe 0 (ConvertNumber.readParts base big small))
+      LispNumber $ LispFloat $ double2Float (fromMaybe 0 (ConvertNumber.readParts base big small))
   in do
     whole <- baseCharParser
     maybeFraction <- Parsec.optionMaybe (Parsec.char '.' >> baseCharParser)

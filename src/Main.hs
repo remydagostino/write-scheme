@@ -1,18 +1,32 @@
 module Main where
 
-import qualified System.Environment as SysEnv
+import System.Exit (exitFailure)
+import System.Environment (getArgs)
 import qualified Text.ParserCombinators.Parsec as Parsec
 
 import qualified Parsers.List as ParseList
+import Data.Lisp.Eval (eval)
+import Data.Lisp (LispVal(LispString))
 
 main :: IO ()
-main = do
-  args <- SysEnv.getArgs
-  putStrLn $ readExpr (args !! 0)
+main =
+  let
+    run :: [String] -> IO ()
+    run [lispInput] = print . eval . readExpr $ lispInput
+    run _ = putStrLn "Bad Input" >> exitFailure
+  in
+    getArgs >>= run
 
 
-readExpr :: String -> String
+schemeParser :: Parsec.Parser LispVal
+schemeParser = do
+  val <- ParseList.expression
+  Parsec.eof
+  return val
+
+
+readExpr :: String -> LispVal
 readExpr input =
-  case Parsec.parse (ParseList.expression >> Parsec.eof) "lisp" input of
-    Left err -> "No match: " ++ show err
-    Right val -> "Found value"
+  case Parsec.parse schemeParser "lisp" input of
+    Left err -> LispString $ "No match: " ++ show err
+    Right val -> val
